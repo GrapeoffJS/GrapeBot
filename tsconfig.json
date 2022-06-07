@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "incremental": true,
+        "target": "ESNext",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "CommonJS",
+        "rootDir": "./src",
+        "moduleResolution": "node",
+        "baseUrl": "./src",
+        "allowJs": false,
+        "checkJs": false,
+        "declaration": false,
+        "declarationMap": false,
+        "emitDeclarationOnly": false,
+        "sourceMap": false,
+        "outDir": "./dist",
+        "removeComments": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "paths": {
+            "@common/*": ["common/*"]
+        }
+    }
+}
