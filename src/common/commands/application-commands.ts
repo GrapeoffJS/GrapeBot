@@ -1,5 +1,5 @@
 import { Command } from '@common/commands/command';
-import { getConfigVariable } from '@common/utils/get-config-variable';
+import { readConfigVariable } from '@common/utils/read-config-variable';
 import { REST } from '@discordjs/rest';
 import { Collection } from 'discord.js';
 import {
@@ -23,21 +23,20 @@ export class ApplicationCommands {
 
     private constructor() {}
 
-    public getAllApplicationCommands() {
-        return ApplicationCommands._instance._commands;
+    public getCommand(name: string) {
+        return this._commands.get(name);
     }
 
-    public static async getInstance() {
+    public static getInstance() {
         if (!ApplicationCommands._instance) {
             ApplicationCommands._instance = new ApplicationCommands();
-            await ApplicationCommands.registerAllApplicationCommands();
         }
 
         return ApplicationCommands._instance;
     }
 
-    private static async registerAllApplicationCommands() {
-        if (!ApplicationCommands._instance._areCommandsRegistered) {
+    public async registerAllApplicationCommands() {
+        if (!this._areCommandsRegistered) {
             const commandsPath = path.join(process.cwd(), 'dist', 'commands');
             const files = await fs.promises.readdir(commandsPath);
 
@@ -45,34 +44,29 @@ export class ApplicationCommands {
                 const filePath = path.join(commandsPath, file);
                 const command: Command = await import(filePath);
 
-                ApplicationCommands._instance._commands.set(
-                    command.data.name,
-                    command,
-                );
-                ApplicationCommands._instance._commandsBody.push(
-                    command.data.toJSON(),
-                );
+                this._commands.set(command.data.name, command);
+                this._commandsBody.push(command.data.toJSON());
 
-                ApplicationCommands._instance._areCommandsRegistered = true;
+                this._areCommandsRegistered = true;
             }
         }
 
-        return ApplicationCommands._instance;
+        return this;
     }
 
     public async deploy() {
         const rest = new REST({ version: '9' }).setToken(
-            getConfigVariable('TOKEN'),
+            readConfigVariable('TOKEN'),
         );
 
         try {
             await rest.put(
                 Routes.applicationGuildCommands(
-                    getConfigVariable('CLIENT_ID'),
-                    getConfigVariable('GUILD_ID'),
+                    readConfigVariable('CLIENT_ID'),
+                    readConfigVariable('GUILD_ID'),
                 ),
                 {
-                    body: ApplicationCommands._instance._commandsBody,
+                    body: this._commandsBody,
                 },
             );
 
