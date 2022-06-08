@@ -11,10 +11,6 @@ export class Client {
     public static getInstance(clientOptions?: ClientOptions): DiscordClient {
         if (!Client._instance && clientOptions) {
             Client._instance = new Client(clientOptions);
-
-            Client._instance._discordClientInstance.once('ready', () => {
-                console.log('Client is Ready!');
-            });
         }
 
         return Client._instance._discordClientInstance;
