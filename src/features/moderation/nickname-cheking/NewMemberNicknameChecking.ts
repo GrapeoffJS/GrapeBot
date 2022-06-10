@@ -1,21 +1,22 @@
-import { FORBIDDEN_NICKNAMES } from '@common/config/forbidden-nicknames';
+import { STRINGS } from '@common/config/strings';
 import { Feature } from '@common/Feature';
-import { createLinkToChannel } from '@common/utils/create-link-to-channel';
+import { ForbiddenNicknameModel } from '@common/models/forbidden-nickname.model';
 import { ClientEvents, GuildMember, MessageEmbed } from 'discord.js';
+
+const { MEMBER_NICKNAME_CHECKING, FOOTER_WATERMARK } = STRINGS.MODERATION;
+const { FIELDS, TITLE, URL_TO_RULES } = MEMBER_NICKNAME_CHECKING;
 
 export class NewMemberNicknameChecking extends Feature {
     readonly trackedEvent: keyof ClientEvents = 'guildMemberAdd';
 
     async handle(member: GuildMember): Promise<void> {
-        if (
-            FORBIDDEN_NICKNAMES.includes(
-                member.nickname
-                    ? member.nickname.toLowerCase().trim().replace(/\s+/g, '')
-                    : '',
-            )
-        ) {
-            await NewMemberNicknameChecking.warn(member);
+        const forbiddenNickname = await ForbiddenNicknameModel.findOne({
+            nickname: member.nickname?.replace(/\s+/g, '').toLowerCase(),
+        });
+
+        if (forbiddenNickname) {
             await member.setNickname('[Запрещённый Никнейм]');
+            await NewMemberNicknameChecking.warn(member);
         }
     }
 
@@ -24,28 +25,28 @@ export class NewMemberNicknameChecking extends Feature {
         await dmChannel.send({
             embeds: [
                 new MessageEmbed()
-                    .setColor('#fc4b4b')
-                    .setTitle('Вы нарушаете правила сервера!')
+                    .setColor('RED')
+                    .setTitle(TITLE)
                     .addFields([
                         {
-                            name: 'Что произошло?',
-                            value: 'Ваш никнейм недопустим на данном сервере и был сменён на временный.',
+                            name: FIELDS.WHAT_HAPPENED.name,
+                            value: FIELDS.WHAT_HAPPENED.value,
                         },
                         {
-                            name: 'Что нужно сделать?',
-                            value: 'Вы должны сменить ваш текущий никнейм в соответствии с правилами из пункта "Ники и Аватарки" правил сервера.',
+                            name: FIELDS.WHAT_TO_DO.name,
+                            value: FIELDS.WHAT_TO_DO.value,
                         },
                         {
-                            name: 'Что будет при повторных нарушениях?',
-                            value: 'Вы будете выгнаны с сервера на несколько дней. Если подобное поведение продолжится после второго присоединения, вы получите бан.',
+                            name: FIELDS.WHAT_IF_REPEAT.name,
+                            value: FIELDS.WHAT_IF_REPEAT.value,
                         },
                         {
-                            name: 'Что делать, если предупреждение получено по ошибке?',
-                            value: 'Вам нужно обратиться к администрации сервера и объяснить ситуацию. Если ошибочное срабатывание будет доказано, с вас снимут предупреждение.',
+                            name: FIELDS.WHAT_IF_THERE_IS_A_MISTAKE.name,
+                            value: FIELDS.WHAT_IF_THERE_IS_A_MISTAKE.value,
                         },
                     ])
-                    .setURL(createLinkToChannel('RULES_CHANNEL_ID'))
-                    .setFooter({ text: 'Система модерации GrapeCode++' }),
+                    .setURL(URL_TO_RULES)
+                    .setFooter({ text: FOOTER_WATERMARK }),
             ],
         });
     }
