@@ -1,7 +1,8 @@
-import { prop } from '@typegoose/typegoose';
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 
-export class MemberModel extends TimeStamps {
+@modelOptions({ schemaOptions: { collection: 'Members' } })
+class Member extends TimeStamps {
     @prop({ required: true })
     nickname!: string;
 
@@ -11,3 +12,5 @@ export class MemberModel extends TimeStamps {
     @prop({ default: 0 })
     experiencePoints!: number;
 }
+
+export const MemberModel = getModelForClass(Member);
