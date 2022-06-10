@@ -1,13 +1,14 @@
 import { DiscordClient } from '@common/DiscordClient';
 import { MongoDBConnectionURIBuilder } from '@common/utils/MongoDBConnectionURIBuilder';
 import { readConfigVariable } from '@common/utils/read-config-variable';
+import { mongoose } from '@typegoose/typegoose';
 import { Intents } from 'discord.js';
 import { config } from 'dotenv';
-import mongoose from 'mongoose';
 
 import { NotifyApplicationStarted } from './features/application-startup/NotifyApplicationStarted';
 import { NewMemberNicknameChecking } from './features/moderation/nickname-cheking/NewMemberNicknameChecking';
 import { UpdatedMemberNicknameChecking } from './features/moderation/nickname-cheking/UpdatedMemberNicknameChecking';
+import { NSFWContentFiltering } from './features/moderation/nsfw-content/NSFWContentFiltering';
 
 config();
 
@@ -31,6 +32,7 @@ client.useFeatures(new NotifyApplicationStarted());
 client.useFeatures(
     new NewMemberNicknameChecking(),
     new UpdatedMemberNicknameChecking(),
+    new NSFWContentFiltering(),
 );
 
 async function initialize() {
