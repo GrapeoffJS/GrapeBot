@@ -6,7 +6,8 @@
     "scripts": {
         "start:dev": "nodemon dist/app.js",
         "build:dev": "tsc --watch",
-        "build": "tsc --project tsconfig.json"
+        "build": "tsc --project tsconfig.json",
+        "deploy:forbidden_nicknames": "ts-node -r tsconfig-paths/register src/scripts/deploy-forbidden-commands.ts"
     },
     "engines": {
         "node": ">=17.0.0"
@@ -24,14 +25,19 @@
     "dependencies": {
         "@discordjs/builders": "^0.15.0",
         "@discordjs/rest": "^0.5.0",
+        "@tensorflow/tfjs-node": "^3.18.0",
         "@typegoose/typegoose": "^9.9.0",
+        "axios": "^0.27.2",
         "class-validator": "^0.13.2",
         "discord-api-types": "^0.33.4",
         "discord.js": "^13.8.0",
         "dotenv": "^16.0.1",
-        "mongoose": "^6.3.5"
+        "mongoose": "^6.3.5",
+        "nsfwjs": "^2.4.1"
     },
     "devDependencies": {
+        "@types/": "tensorflow/tfjs-node",
+        "@types/axios": "^0.14.0",
         "@types/dotenv": "^8.2.0",
         "@types/node": "^17.0.40",
         "@typescript-eslint/eslint-plugin": "^5.27.1",
@@ -54,8 +60,7 @@
         "typescript": "^4.7.3"
     },
     "nodemonConfig": {
-        "ignore":
-        [
+        "ignore": [
             "**/*.test.ts",
             "**/*.spec.ts",
             ".git",
