@@ -1,5 +1,4 @@
 export const FORBIDDEN_NICKNAMES = [
-    '',
     'user',
     'discorduser',
     'nickname',
